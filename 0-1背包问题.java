@@ -1,65 +1,91 @@
 package arithmeticDemo;
-import java.util.Scanner;
 
-public class TXSFTest
-{
-	public static int[] zhonliang = { 35, 30, 60, 50, 40, 10, 25 };
-	public static int[] jiazhi = { 10, 40, 30, 50, 35, 40, 30 };
+import java.util.*;
 
+public class DynamicProgramming {
+ 
 	public static void main(String[] args) {
-		Scanner sc=new Scanner(System.in);
-		int zonzhong=sc.nextInt();//总重量
-		
-		//调用函数
-		maxJiaZhi(zonzhong);		
-	}
-
-	//求价值
-	private static void maxJiaZhi(int zonzhong) {
-		//存储累加的重量和价值
-		int maxZhong=0;
-		int maxJia=0;
-		//存放密度
-		double[] midu=new double[7];
-		//存放索引的数组
-		int [] index=new int[7];
-		for (int i = 0; i < midu.length; i++)
-		{
-			midu[i]=(double)jiazhi[i]/zhonliang[i];	
-			index[i]=i;
-		}
-		//冒泡排序
-		for (int i = 0; i < midu.length-1; i++)
-		{
-			for (int j = 0; j < midu.length-1-i; j++)
-			{
-				if (midu[j]<midu[j+1])
-				{
-					double temp=midu[j];
-					midu[j]=midu[j+1];
-					midu[j+1]=temp;
-					
-					//索引跟着交换
-					int temp1=index[j];
-					index[j]=index[j+1];
-					index[j+1]=temp1;
+		Scanner sc = new Scanner(System.in);
+		while (sc.hasNext()) {
+ 
+			/* 1.读取数据 */
+ 
+			int number = sc.nextInt(); // 物品的数量
+ 
+			// 注意：我们声明数组的长度为"n+1",并另weight[0]和value[0]等于0。
+			// 从而使得 数组的下标，对应于题目的序号.
+			int[] weight = new int[number + 1]; // {0,2,3,4,5} 每个物品对应的重量
+			int[] value = new int[number + 1]; // {0,3,4,5,6} 每个物品对应的价值
+ 
+			weight[0] = 0;
+			for (int i = 1; i < number + 1; i++) {
+				weight[i] = sc.nextInt();
+			}
+ 
+			value[0] = 0;
+			for (int i = 1; i < number + 1; i++) {
+				value[i] = sc.nextInt();
+			}
+ 
+			int capacity = sc.nextInt(); // 背包容量
+ 
+			/* 2.求解01背包问题 */
+			// 声明动态规划表.其中v[i][j]对应于：当前有i个物品可选，
+			//并且当前背包的容量为j时，我们能得到的最大价值
+			int[][] v = new int[number + 1][capacity + 1];
+ 
+			// 填动态规划表。当前有i个物品可选，并且当前背包的容量为j。
+			for(int i=0;i<=number;i++)  v[i][0]=0;
+			for(int j=0;j<capacity;j++) v[0][j]=0;
+			for (int i = 1; i < number + 1; i++) {
+				for (int j = 1; j < capacity + 1; j++) {
+						if (j < weight[i]) {
+							v[i][j] = v[i - 1][j];// 包的容量比当前该物品体积小，
+							//装不下，此时的价值与前i-1个的价值是一样的，
+							//即V(i,j)=V(i-1,j)；
+						} else {
+	// 还有足够的容量可以装当前该物品，但装了当前物品也不一定达到当前最优价值，
+	//所以在装与不装之间选择最优的一个，即V(i,j)=max｛V(i-1,j)，V(i-1,j-w(i))+v(i)｝。							
+							v[i][j] = Math.max(v[i - 1][j], v[i - 1][j - weight[i]] + value[i]);
+						}
+					}
+			}
+ 
+			System.out.println();
+			System.out.println("动态规划表如下：");
+			for (int i = 0; i < number + 1; i++) {
+				for (int j = 0; j < capacity + 1; j++) {
+					System.out.print(v[i][j] + "\t");
+				}
+				System.out.println();
+			}
+			// 有number个物品可选，且背包的容量为capacity的情况下，能装入背包的最大价值
+			System.out.println("背包内最大的物品价值总和为：" + v[number][capacity]);
+ 
+			/* 3.价值最大时，包内装入了哪些物品？ */
+ 
+			int[] item = new int[number + 1];// 下标i对应的物品若被选中，设置值为1
+			Arrays.fill(item, 0);// 将数组item的所有元素初始化为0
+ 
+			// 从最优解，倒推回去找
+			int j = capacity;
+			for (int i = number; i > 0; i--) {
+				if (v[i][j] > v[i - 1][j]) {// 在最优解中，v[i][j]>v[i-1][j]说明选择了第i个商品
+					item[i] = 1;
+					j = j - weight[i];
 				}
 			}
-		}
-		
-		//计算最优解
-		for (int i = 0; i < index.length; i++)
-		{
-			if (zhonliang[index[i]]<=zonzhong)
-			{
-				maxZhong+=zhonliang[index[i]];
-				maxJia+=jiazhi[index[i]];
-				zonzhong-=zhonliang[index[i]];
+ 
+			System.out.print("包内物品的编号为：");
+			for (int i = 0; i < number + 1; i++) {
+				if (item[i] == 1) {
+					System.out.print(i + " ");
+				}
 			}
+			System.out.println("----------------------------");
+ 
 		}
-		
-		System.out.println("总重量："+maxZhong);
-		System.out.println("总价值："+maxJia);
+ 
 	}
-
+ 
 }
