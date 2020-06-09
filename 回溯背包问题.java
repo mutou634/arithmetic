@@ -1,4 +1,6 @@
-public class Zero_One {
+package arithmeticDemo;
+import java.util.Scanner;
+public class OneZero {
 private static int[] p;//物品的价值数组
 private static int[] w;//物品的重量数组
 private static int c;//最大可以拿的重量
@@ -12,39 +14,28 @@ private static int r;//剩余物品的价值
 private static int[] cx;//存放当前解
 private static int[] bestx;//存放最终解
 
-public static int Loading(int[] ww,int[] pp, int cc) {
-    //初始化数据成员，数组下标从1开始
-    count = ww.length - 1;
-    w = ww;
-    p = pp;
-    c = cc;
+public static void Loading() {
     cw = 0;
     bestp = 0;
     cx = new int[count+1];
     bestx = new int [count+1];
-
     //初始化r，即剩余最大价格
     for(int i = 1;i<=count;i++) {
         r += p[i];
     }
-
     //调用回溯法计算
     BackTrack(1);
-    return bestp;   
 }
 
-/**
- * 回溯
- * @param t
- */
 public static void BackTrack(int t) {
     if(t>count) {//到达叶结点
         if(cp>bestp) {
-            for(int i = 1;i<=count;i++) {
+           for(int i = 1;i<=count;i++) {
                 bestx[i] = cx[i];
-            }
-
+          }
+        	//bestx=cx;   不能这样写，因为这样其实是直接给地址，后cx变化，bestx也会改变
             bestp = cp;
+            return;
         }
         return;
     }
@@ -66,17 +57,26 @@ public static void BackTrack(int t) {
     }
     r += p[t];//恢复现场
 }
-
-
-
 public static void main(String[] args) {
     //测试
-    int[] w1 = {0,15,25,40,20,15,24};
-    int[] p1 = {0,10,5,20,2,14,23};
-    int c1 = 30;
-    Loading(w1,p1,c1);
+	Scanner in=new Scanner(System.in); 
+	System.out.println("请输入物品个数：");
+	int length=in.nextInt();
+	w=new int[length+1];   w[0]=0;
+	p=new int[length+1];   p[0]=0;
+	System.out.println("请依次输入物品重量、价值：");
+	for(int i=1;i<=length;i++) {
+		w[i]=in.nextInt();
+		p[i]=in.nextInt();
+	}
+	count=length;
+	System.out.println("请输入背包可承受最大重量：");
+    c=in.nextInt();
+    in.close();
+    Loading();
     System.out.println("最优装载为：" + bestp);
     for(int i =1;i<=count;i++) {
         System.out.print(bestx[i] + " ");
     }           
+  }
 }
