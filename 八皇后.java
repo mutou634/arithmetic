@@ -1,63 +1,51 @@
+package arithmeticDemo;
 public class Queen {
-    public static int num = 0;//累计方案
-    public static final int MAXQUEEN = 8;
-    public static int[] cols = new int[MAXQUEEN];   //定义数组，表示8列棋子皇后摆放的位置
- 
- 
+    int queens=8;
+    //定义数组用于保存皇后摆放位置的结果
+    int[] array=new int[queens];
+    static int count=0;
+    public static void main(String[] args) {
+        Queen e = new Queen();
+        e.check(0);
+        System.out.printf("一共有%d中解法！",count);
+    }
     /**
-     * @param n 表示填第n列的皇后
-     * */
-    public void getCount(int n){
-        boolean[] rows = new boolean[MAXQUEEN];
- 
-        for(int i = 0;i < n;i++){
-            rows[cols[i]] = true;
- 
-            int d = n - i;  //计算差值
- 
-            //正斜方向
-            if(cols[i] - d >= 0){
-                rows[cols[i]- d] = true;
-            }
- 
-            //反斜方向
-            if(cols[i] + d <= (MAXQUEEN - 1)){
-                rows[cols[i] + d] = true;
-            }
+     * 摆放皇后
+     * @param n
+     */
+    private void check(int n){
+        if(n==queens){//当n等于8时说明8个皇后已经放好
+            print();
+            return;
         }
- 
-        for(int i = 0;i < MAXQUEEN;i++){
-            if(rows[i]){
-                continue;
-            }
-            cols[n] = i;
- 
-            if(n < MAXQUEEN - 1){
-                getCount(n + 1);
-            }else{
-                //找到一套完整的方案
-                num++;
-                printQueen();
+        //依次放入皇后，并判断是否冲突
+        for (int i = 0; i < queens; i++) {
+            //将当前这个皇后n放到该行的第i列
+            array[n]=i;
+            //判断当前位置是否冲突
+            if(judge(n)){//不冲突
+                //接着放n+1个皇后
+                check(n+1);
             }
         }
     }
- 
-    public void printQueen(){
-        System.out.println("第" + num + "种方案");
-        for(int i = 0;i < MAXQUEEN;i++){
-            for(int j = 0;j < MAXQUEEN;j++){
-                if(i == cols[j])
-                    System.out.print("0 ");
-                else
-                    System.out.print("+ ");
+    //判断是否冲突：1、行不用考虑，同列 2、斜线判断，等同于坐标中绝对斜率不能为1
+    private boolean judge(int n){
+        for (int i = 0; i < n; i++) {
+            if(array[i]==array[n]||Math.abs(n-i)==Math.abs(array[n]-array[i])){
+                    return false;
             }
-            System.out.println();
         }
+        return true;
     }
- 
-    public static void main(String[] args){
-        Queen q = new Queen();
-        q.getCount(0);
+    /**
+     * 打印皇后的摆放结果
+     */
+    public void print(){
+        count ++;
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i]+" ");
+        }
+        System.out.println();
     }
- 
 }
