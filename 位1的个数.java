@@ -12,3 +12,13 @@ public class Solution {
     return bits;
     }
 }
+//第二种方法，位操作小技巧
+public int hammingWeight(int n) {
+    int sum = 0;
+    while (n != 0) {
+        sum++;
+        n &= (n - 1);
+    }
+    return sum;
+}
+
